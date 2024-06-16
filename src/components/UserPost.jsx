@@ -76,7 +76,7 @@ function UserPost({ postImg, postTitle, likes, replies }) {
           )}
 
           {/* Reaction icons */}
-          <Flex gap={3} my={1}>
+          <Flex gap={3} my={1} className="reactions">
             <ActionButtons liked={liked} setLiked={setLiked} />
           </Flex>
 
