@@ -41,7 +41,11 @@ function UserHeader() {
           <Flex gap={2} alignItems={"center"}>
             <Text fontSize={"sm"}>markzuckerberg</Text>
             <Text
-              fontSize={"xs"}
+              fontSize={{
+                base: "xs",
+                md: "sm",
+                lg: "md",
+              }}
               bg={"gray.dark"}
               color={"gray.light"}
               p={1}
@@ -51,7 +55,14 @@ function UserHeader() {
           </Flex>
         </Box>
         <Box>
-          <Avatar name="Mark Zuckerberg" src="/zuck-avatar.png" size={"xl"} />
+          <Avatar
+            name="Mark Zuckerberg"
+            src="/zuck-avatar.png"
+            size={{
+              base: "md",
+              md: "xl",
+            }}
+          />
         </Box>
       </Flex>
 
@@ -80,6 +91,26 @@ function UserHeader() {
               </Portal>
             </Menu>
           </Box>
+        </Flex>
+      </Flex>
+
+      <Flex w={"full"}>
+        <Flex
+          flex={1}
+          borderBottom={"1.5px solid white"}
+          justifyContent={"center"}
+          pb="3"
+          cursor={"pointer"}>
+          <Text fontWeight={"bold"}>Threads</Text>
+        </Flex>
+        <Flex
+          flex={1}
+          borderBottom={"1px solid gray"}
+          justifyContent={"center"}
+          color={"gray.light"}
+          pb="3"
+          cursor={"pointer"}>
+          <Text fontWeight={"bold"}>Replies</Text>
         </Flex>
       </Flex>
     </VStack>
