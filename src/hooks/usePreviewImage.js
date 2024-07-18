@@ -22,7 +22,6 @@ function usePreviewImage() {
       setImageUrl(null);
     }
   };
-  console.log(imageUrl);
   return { handleImageChange, imageUrl };
 }
 

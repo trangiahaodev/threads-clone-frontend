@@ -21,6 +21,10 @@ import usePreviewImage from "../hooks/usePreviewImage";
 import useShowToast from "../hooks/useShowToast";
 
 export default function UpdateProfilePage() {
+  // Recoil hooks
+  const [user, setUser] = useRecoilState(userAtom);
+  console.log("user: ", user);
+
   // React hooks
   const [inputs, setInputs] = useState({
     name: user.name,
@@ -35,14 +39,11 @@ export default function UpdateProfilePage() {
   const showToast = useShowToast();
   const { handleImageChange, imageUrl } = usePreviewImage();
 
-  // Recoil hooks
-  const [user, setUser] = useRecoilState(userAtom);
-
   // Handle functions
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await fetch(`/api/users/update/:${user._id}`, {
+      const res = await fetch(`/api/users/update/${user._id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -55,7 +56,7 @@ export default function UpdateProfilePage() {
         showToast("Error", data.error, "error");
         return;
       }
-      showToast("Success", data.message, "success");
+      showToast("Success", "Profile updated successfully", "success");
       setUser(data);
       localStorage.setItem("user-threads", JSON.stringify(data));
     } catch (err) {
@@ -115,7 +116,7 @@ export default function UpdateProfilePage() {
               }
             />
           </FormControl>
-          <FormControl isRequired>
+          <FormControl>
             <FormLabel>User name</FormLabel>
             <Input
               placeholder="johndoe"
@@ -130,7 +131,7 @@ export default function UpdateProfilePage() {
               }
             />
           </FormControl>
-          <FormControl isRequired>
+          <FormControl>
             <FormLabel>Email</FormLabel>
             <Input
               placeholder="your-email@example.com"
@@ -145,7 +146,7 @@ export default function UpdateProfilePage() {
               }
             />
           </FormControl>
-          <FormControl isRequired>
+          <FormControl>
             <FormLabel>Biography</FormLabel>
             <Input
               placeholder="Your bio..."
@@ -153,7 +154,7 @@ export default function UpdateProfilePage() {
               type="text"
             />
           </FormControl>
-          <FormControl isRequired>
+          <FormControl>
             <FormLabel>Password</FormLabel>
             <Input
               placeholder="Password"
