@@ -23,7 +23,6 @@ import useShowToast from "../hooks/useShowToast";
 export default function UpdateProfilePage() {
   // Recoil hooks
   const [user, setUser] = useRecoilState(userAtom);
-  console.log("user: ", user);
 
   // React hooks
   const [inputs, setInputs] = useState({
@@ -34,6 +33,7 @@ export default function UpdateProfilePage() {
     password: "",
   });
   const fileRef = useRef(null);
+  const [updating, setUpdating] = useState(false);
 
   // Custom hooks
   const showToast = useShowToast();
@@ -42,6 +42,10 @@ export default function UpdateProfilePage() {
   // Handle functions
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (updating) return;
+    setUpdating(true);
+
     try {
       const res = await fetch(`/api/users/update/${user._id}`, {
         method: "PUT",
@@ -56,11 +60,14 @@ export default function UpdateProfilePage() {
         showToast("Error", data.error, "error");
         return;
       }
+
       showToast("Success", "Profile updated successfully", "success");
       setUser(data);
       localStorage.setItem("user-threads", JSON.stringify(data));
     } catch (err) {
       showToast("Error", err.message, "error");
+    } finally {
+      setUpdating(false);
     }
   };
 
@@ -180,7 +187,8 @@ export default function UpdateProfilePage() {
               _hover={{
                 bg: "green.500",
               }}
-              type="submit">
+              type="submit"
+              isLoading={updating}>
               Submit
             </Button>
           </Stack>

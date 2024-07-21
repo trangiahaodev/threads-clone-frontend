@@ -20,25 +20,65 @@ import { Link as RouterLink } from "react-router-dom";
 
 import { useRecoilValue } from "recoil";
 import userAtom from "../atoms/userAtom";
+import { useState } from "react";
+import useShowToast from "../hooks/useShowToast";
 
 function UserHeader({ user }) {
-  const toast = useToast();
+  const showToast = useShowToast();
   const currentUser = useRecoilValue(userAtom);
+  const [updating, setUpdating] = useState(false);
+
+  // user is the one whose profile is being viewed
+  const [following, setFollowing] = useState(
+    user.followers.includes(currentUser._id)
+  );
+
+  const handleFollowAndUnfollow = async () => {
+    if (!currentUser) {
+      showToast("Error", "Please login to follow", "error");
+      return;
+    }
+    if (updating) return;
+    setUpdating(true);
+
+    try {
+      const res = await fetch(`/api/users/follow/${user._id}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      const data = await res.json();
+      if (data.error) {
+        showToast("Error", data.error, "error");
+        return;
+      }
+
+      if (following) {
+        showToast("Success", "Unfollowed successfully", "success");
+        user.followers.pop(); // remove the current user from the followers array
+      } else {
+        showToast("Success", "Followed successfully", "success");
+        user.followers.push(currentUser._id); // add the current user to the followers array
+      }
+
+      setFollowing(!following);
+    } catch (err) {
+      showToast("Error", err, "error");
+    } finally {
+      setUpdating(false);
+    }
+  };
 
   const copyURL = () => {
     const currentURL = window.location.href;
-    navigator.clipboard.writeText(currentURL).then(() => {
-      toast({
-        title: "Account created",
-        status: "success",
-        description: "Profile link copied",
-        duration: 3000,
-        isClosable: true,
-      });
-    });
+    navigator.clipboard
+      .writeText(currentURL)
+      .then(() =>
+        showToast("Account created", "Profile link copied", "success")
+      );
   };
-
-  // console.log(currentUser._id, user._id);
 
   return (
     <VStack gap={4} alignItems={"start"}>
@@ -95,8 +135,15 @@ function UserHeader({ user }) {
         </Link>
       )}
 
-      {currentUser._id !== user._id && <Button size={"sm"}>Follow</Button>}
-      
+      {currentUser._id !== user._id && (
+        <Button
+          size={"sm"}
+          onClick={handleFollowAndUnfollow}
+          isLoading={updating}>
+          {following ? "Unfollow" : "Follow"}
+        </Button>
+      )}
+
       <Flex w={"full"} justifyContent={"space-between"}>
         <Flex gap={2} alignItems={"center"}>
           <Text color={"gray.light"}>{user.followers.length} followers</Text>

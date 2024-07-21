@@ -31,6 +31,7 @@ function UserPage() {
     <>
       {/* This one is gonna last when we implement isLoading */}
       {user && <UserHeader user={user} />}
+
       {/* <UserHeader user={user} /> */}
       <UserPost
         likes={1200}
