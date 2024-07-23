@@ -23,23 +23,73 @@ import {
 import { BsFillImageFill } from "react-icons/bs";
 
 import usePreviewImage from "../hooks/usePreviewImage";
+import { useRecoilValue } from "recoil";
+import userAtom from "../atoms/userAtom";
+import useShowToast from "../hooks/useShowToast";
 
 const MAX_CHAR = 500;
 
 function CreatePost() {
+  // React hooks
   const imageRef = useRef(null);
   const [postText, setPostText] = useState("");
-  const [remainingChar, setRemainingChar] = useState(500);
+  const [remainingChar, setRemainingChar] = useState(MAX_CHAR);
+  const [loading, setLoading] = useState(false);
 
+  // Chakra UI
   const { isOpen, onOpen, onClose } = useDisclosure();
 
+  // Custom hooks
   const { imageUrl, handleImageChange, setImageUrl } = usePreviewImage();
+  const showToast = useShowToast();
+
+  // Recoil
+  const user = useRecoilValue(userAtom);
 
   const handleTextChange = (e) => {
     const inputText = e.target.value;
+
+    if (inputText.length > MAX_CHAR) {
+      const truncatedText = inputText.slice(0, MAX_CHAR);
+      setPostText(truncatedText);
+      setRemainingChar(0);
+    } else {
+      setPostText(inputText);
+      setRemainingChar(MAX_CHAR - inputText.length);
+    }
   };
 
-  const handleCreatePost = async () => {};
+  const handleCreatePost = async () => {
+    setLoading(true);
+
+    try {
+      const res = await fetch("/api/posts/create", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          postedBy: user._id,
+          text: postText,
+          img: imageUrl,
+        }),
+      });
+
+      const data = await res.json();
+      if (data.error) {
+        showToast("Error", data.error, "error");
+        return;
+      }
+      showToast("Success", "Post created successfully", "success");
+      onClose();
+      setPostText("");
+      setImageUrl("");
+    } catch (err) {
+      showToast("Error", err, "error");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <>
@@ -56,7 +106,7 @@ function CreatePost() {
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
 
-        <ModalContent>
+        <ModalContent bg={"gray.800"}>
           <ModalHeader>Create Post</ModalHeader>
           <ModalCloseButton />
           <ModalBody pb={6}>
@@ -71,8 +121,8 @@ function CreatePost() {
                 fontWeight={"bold"}
                 textAlign={"right"}
                 m={"1"}
-                color={"gray.800"}>
-                500/500
+                color={"gray.500"}>
+                {remainingChar}/500
               </Text>
 
               <Input
@@ -106,7 +156,11 @@ function CreatePost() {
           </ModalBody>
 
           <ModalFooter>
-            <Button colorScheme="blue" mr={3} onClick={handleCreatePost}>
+            <Button
+              colorScheme="blue"
+              mr={3}
+              onClick={handleCreatePost}
+              isLoading={loading}>
               Post
             </Button>
           </ModalFooter>

@@ -46,16 +46,18 @@ export default function UpdateProfilePage() {
     if (updating) return;
     setUpdating(true);
 
+    console.log(inputs);
+
     try {
       const res = await fetch(`/api/users/update/${user._id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ ...inputs, profilePicture: imageUrl }),
+        body: JSON.stringify({ ...inputs, profilePic: imageUrl }),
       });
 
-      const data = await res.json();
+      const data = await res.json(); // updated user object
       if (data.error) {
         showToast("Error", data.error, "error");
         return;
@@ -64,8 +66,8 @@ export default function UpdateProfilePage() {
       showToast("Success", "Profile updated successfully", "success");
       setUser(data);
       localStorage.setItem("user-threads", JSON.stringify(data));
-    } catch (err) {
-      showToast("Error", err.message, "error");
+    } catch (error) {
+      showToast("Error", error, "error");
     } finally {
       setUpdating(false);
     }
@@ -156,22 +158,23 @@ export default function UpdateProfilePage() {
           <FormControl>
             <FormLabel>Biography</FormLabel>
             <Input
-              placeholder="Your bio..."
-              _placeholder={{ color: "gray.500" }}
-              type="text"
+              placeholder="Your bio."
               value={inputs.biography}
               onChange={(e) =>
-                setInputs((inputs) => ({
-                  ...inputs,
-                  biography: e.target.value,
-                }))
+                setInputs({ ...inputs, biography: e.target.value })
               }
+              _placeholder={{ color: "gray.500" }}
+              type="text"
             />
           </FormControl>
           <FormControl>
             <FormLabel>Password</FormLabel>
             <Input
               placeholder="Password"
+              value={inputs.password}
+              onChange={(e) =>
+                setInputs({ ...inputs, password: e.target.value })
+              }
               _placeholder={{ color: "gray.500" }}
               type="password"
             />
