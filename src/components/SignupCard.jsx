@@ -22,10 +22,8 @@ import useShowToast from "../hooks/useShowToast";
 import userAtom from "../atoms/userAtom";
 
 export default function SignupCard() {
-  const showToast = useShowToast();
-
+  // React hooks
   const [showPassword, setShowPassword] = useState(false);
-  const setAuthScreen = useSetRecoilState(authScreenAtom);
   const [inputs, setInputs] = useState({
     name: "",
     username: "",
@@ -33,10 +31,16 @@ export default function SignupCard() {
     email: "",
   });
 
+  // Recoil hooks
+  const setAuthScreen = useSetRecoilState(authScreenAtom);
   const setUser = useSetRecoilState(userAtom);
+
+  // Custom hooks
+  const showToast = useShowToast();
 
   const handleSignup = async (e) => {
     e.preventDefault();
+
     try {
       const res = await fetch("/api/users/signup", {
         method: "POST",
@@ -54,8 +58,8 @@ export default function SignupCard() {
 
       localStorage.setItem("user-threads", JSON.stringify(data));
       setUser(data);
-    } catch (err) {
-      showToast("Error", err.message, "error");
+    } catch (error) {
+      showToast("Error", error, "error");
     }
   };
 
@@ -76,7 +80,7 @@ export default function SignupCard() {
             <HStack>
               <Box>
                 <FormControl isRequired>
-                  <FormLabel>Full Name</FormLabel>
+                  <FormLabel>Full name</FormLabel>
                   <Input
                     type="text"
                     onChange={(e) =>

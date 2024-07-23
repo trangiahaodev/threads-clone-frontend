@@ -1,3 +1,4 @@
+// Chakra UI
 import {
   Flex,
   Box,
@@ -13,25 +14,37 @@ import {
   useColorModeValue,
   Link,
 } from "@chakra-ui/react";
-import { useState } from "react";
 import { ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
+
+// React
+import { useState } from "react";
+
+// Recoil
 import { useSetRecoilState } from "recoil";
 import authScreenAtom from "../atoms/authAtom";
-import useShowToast from "../hooks/useShowToast";
 import userAtom from "../atoms/userAtom";
 
+// Custom hooks
+import useShowToast from "../hooks/useShowToast";
+
 export default function LoginCard() {
+  // React hooks
   const [showPassword, setShowPassword] = useState(false);
-  const setAuthScreen = useSetRecoilState(authScreenAtom);
-  const setUser = useSetRecoilState(userAtom);
+  const [loading, setLoading] = useState(false);
   const [inputs, setInputs] = useState({
     username: "",
     password: "",
   });
+
+  // Recoil hooks
+  const setAuthScreen = useSetRecoilState(authScreenAtom);
+  const setUser = useSetRecoilState(userAtom);
+
+  // Custom hooks
   const showToast = useShowToast();
 
-  const handleLogin = async (e) => {
-    e.preventDefault();
+  const handleLogin = async () => {
+    setLoading(true);
 
     try {
       const res = await fetch("/api/users/login", {
@@ -50,8 +63,10 @@ export default function LoginCard() {
 
       localStorage.setItem("user-threads", JSON.stringify(data));
       setUser(data);
-    } catch (err) {
-      showToast("Error", err.message, "error");
+    } catch (error) {
+      showToast("Error", error, "error");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -112,14 +127,15 @@ export default function LoginCard() {
             </FormControl>
             <Stack spacing={10} pt={2}>
               <Button
-                loadingText="Submitting"
+                loadingText="Logging in"
                 size="lg"
                 bg={useColorModeValue("gray.600", "gray.700")}
                 color={"white"}
                 _hover={{
                   bg: useColorModeValue("gray.700", "gray.800"),
                 }}
-                onClick={handleLogin}>
+                onClick={handleLogin}
+                isLoading={loading}>
                 Login
               </Button>
             </Stack>
