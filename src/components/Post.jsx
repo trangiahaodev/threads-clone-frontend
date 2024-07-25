@@ -1,16 +1,12 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Avatar, Box, Flex, Image, Text } from "@chakra-ui/react";
 import { BsThreeDots } from "react-icons/bs";
 
 import ActionButtons from "./ActionButtons";
-import useShowToast from "../hooks/useShowToast";
 
-function Post({ post, postedBy: userId }) {
+function Post({ post, postedBy: user }) {
   const [liked, setLiked] = useState(false);
-  const [user, setUser] = useState(null);
-
-  const showToast = useShowToast();
 
   // *********
   // Optimization: Use aggregation stage to get user's profile while retrieving post
@@ -18,26 +14,24 @@ function Post({ post, postedBy: userId }) {
   // *********
 
   // Fetch user
-  useEffect(() => {
-    const getUser = async () => {
-      try {
-        const res = await fetch("/api/users/profile/" + userId);
-        const data = await res.json();
-        if (data.error) {
-          showToast("Error", data.error, "error");
-          return;
-        }
-        setUser(data);
-      } catch (error) {
-        showToast("Error", error.message, "error");
-        setUser(null);
-      }
-    };
+  // useEffect(() => {
+  //   const getUser = async () => {
+  //     try {
+  //       const res = await fetch("/api/users/profile/" + userId);
+  //       const data = await res.json();
+  //       if (data.error) {
+  //         showToast("Error", data.error, "error");
+  //         return;
+  //       }
+  //       setUser(data);
+  //     } catch (error) {
+  //       showToast("Error", error.message, "error");
+  //       setUser(null);
+  //     }
+  //   };
 
-    getUser();
-  }, [userId, showToast]);
-
-  if (!user) return null;
+  //   getUser();
+  // }, [userId, showToast]);
 
   return (
     <Link to={"/markzuckerberg/post/1"}>
