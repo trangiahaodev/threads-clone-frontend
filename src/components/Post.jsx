@@ -4,34 +4,12 @@ import { Avatar, Box, Flex, Image, Text } from "@chakra-ui/react";
 import { BsThreeDots } from "react-icons/bs";
 
 import ActionButtons from "./ActionButtons";
+import getLatestComments from "../../utils/getLatestComments";
 
 function Post({ post, postedBy: user }) {
   const [liked, setLiked] = useState(false);
 
-  // *********
-  // Optimization: Use aggregation stage to get user's profile while retrieving post
-  // Reference: https://chatgpt.com/c/198134f5-81a3-4b2c-bdfd-b1580af0f656
-  // *********
-
-  // Fetch user
-  // useEffect(() => {
-  //   const getUser = async () => {
-  //     try {
-  //       const res = await fetch("/api/users/profile/" + userId);
-  //       const data = await res.json();
-  //       if (data.error) {
-  //         showToast("Error", data.error, "error");
-  //         return;
-  //       }
-  //       setUser(data);
-  //     } catch (error) {
-  //       showToast("Error", error.message, "error");
-  //       setUser(null);
-  //     }
-  //   };
-
-  //   getUser();
-  // }, [userId, showToast]);
+  const uniqueLatestComments = getLatestComments(post.replies);
 
   return (
     <Link to={"/markzuckerberg/post/1"}>
@@ -41,33 +19,22 @@ function Post({ post, postedBy: user }) {
           <Avatar size={"md"} name={user?.name} src={user?.profilePicture} />
           <Box w="1px" h={"full"} bg={"gray.light"} my={2}></Box>
           <Box position={"relative"} w={"full"}>
-            <Avatar
-              size={"xs"}
-              name="John Doe"
-              src="https://bit.ly/dan-abramov"
-              position={"absolute"}
-              top={"0px"}
-              left={"15px"}
-              padding={"2px"}
-            />
-            <Avatar
-              size={"xs"}
-              name="John Doe"
-              src="https://bit.ly/tioluwani-kolawole"
-              position={"absolute"}
-              bottom={"0px"}
-              right={"-5px"}
-              padding={"2px"}
-            />
-            <Avatar
-              size={"xs"}
-              name="John Doe"
-              src="https://bit.ly/prosper-baba"
-              position={"absolute"}
-              bottom={"0px"}
-              left={"4px"}
-              padding={"2px"}
-            />
+            {post.replies.length === 0 && <Text textAlign={"center"}>🥱</Text>}
+
+            <div style={{ position: "relative", height: "20px" }}>
+              {uniqueLatestComments?.slice(-3).map((reply, index) => (
+                <Avatar
+                  key={reply._id}
+                  size={"xs"}
+                  name={reply.name}
+                  src={reply.userProfilePicture}
+                  position={"absolute"}
+                  bottom={"0px"}
+                  right={`${index * 15}px`}
+                  padding={"2px"}
+                />
+              ))}
+            </div>
           </Box>
         </Flex>
 
