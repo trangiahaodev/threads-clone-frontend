@@ -6,6 +6,8 @@ import ActionButtons from "./ActionButtons";
 import getLatestComments from "../../utils/getLatestComments";
 
 function Post({ post, postedBy: user }) {
+  console.log(post);
+
   const navigate = useNavigate();
 
   const uniqueLatestComments = getLatestComments(post.replies);

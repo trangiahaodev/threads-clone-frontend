@@ -47,7 +47,7 @@ function HomePage() {
       )}
 
       {posts.map((post) => (
-        <Post key={post._id} post={post} postedBy={post.userProfile} />
+        <Post key={post._id} post={post} />
       ))}
     </>
   );
