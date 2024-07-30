@@ -1,16 +1,42 @@
 import { Link, useNavigate } from "react-router-dom";
 import { Avatar, Box, Flex, Image, Text } from "@chakra-ui/react";
+import { DeleteIcon } from "@chakra-ui/icons";
 import { formatDistanceToNow } from "date-fns";
 
 import ActionButtons from "./ActionButtons";
 import getLatestComments from "../../utils/getLatestComments";
+import { useRecoilValue } from "recoil";
+import userAtom from "../atoms/userAtom";
+import useShowToast from "../hooks/useShowToast";
 
-function Post({ post, postedBy: user }) {
-  console.log(post);
+function Post({ post }) {
+  const { postedBy: user } = post;
 
   const navigate = useNavigate();
 
+  const currentUser = useRecoilValue(userAtom);
+
   const uniqueLatestComments = getLatestComments(post.replies);
+  const showToast = useShowToast();
+
+  const handleDeletePost = async (e) => {
+    e.preventDefault();
+
+    try {
+      if (!window.confirm("Are you sure to delete this post?")) return;
+      const res = await fetch(`/api/posts/${post._id}`, {
+        method: "DELETE",
+      });
+      const data = await res.json();
+      if (data.error) {
+        showToast("Error", data.error, "error");
+        return;
+      }
+      showToast("Success", "Post deleted", "success");
+    } catch (error) {
+      showToast("Error", error.message, "error");
+    }
+  };
 
   return (
     <Link to={`/${user.username}/post/${post._id}`}>
@@ -71,6 +97,10 @@ function Post({ post, postedBy: user }) {
                 color={"gray.light"}>
                 {formatDistanceToNow(new Date(post.createdAt))} ago
               </Text>
+
+              {currentUser?._id === user._id && (
+                <DeleteIcon size={20} onClick={handleDeletePost} />
+              )}
             </Flex>
           </Flex>
 

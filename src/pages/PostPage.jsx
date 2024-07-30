@@ -49,7 +49,7 @@ function PostPage() {
       </Box>
 
       <Flex gap={3} my={3} className="reactions">
-        <ActionButtons liked={liked} setLiked={setLiked} />
+        <ActionButtons post={post} />
       </Flex>
 
       <Flex gap={2} alignItems={"center"}>
@@ -58,7 +58,7 @@ function PostPage() {
         </Text>
         <Box w={0.5} h={0.5} borderRadius={"full"} bg={"gray.light"}></Box>
         <Text color={"gray.light"} fontSize={"sm"}>
-          {200 + (liked ? 1 : 0)} replies
+          likes
         </Text>
       </Flex>
 
@@ -74,29 +74,13 @@ function PostPage() {
 
       <Divider my={4} />
 
-      <Comments
+      {/* <Comments
         comment="Looks really good"
         createdAt="2d"
         likes={100}
         username="johndoe"
         userAvatar="https://bit.ly/prosper-baba"
-      />
-
-      <Comments
-        comment="It's is outstanding"
-        createdAt="1d"
-        likes={21}
-        username="allentran"
-        userAvatar="https://bit.ly/code-beast"
-      />
-
-      <Comments
-        comment="Lorem ipsum is simply dummy text of the printing and typesetting industry"
-        createdAt="3d"
-        likes={45}
-        username="streetmemory"
-        userAvatar="https://bit.ly/sage-adebayo"
-      />
+      /> */}
     </>
   );
 }
