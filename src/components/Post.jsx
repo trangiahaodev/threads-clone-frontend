@@ -7,7 +7,7 @@ import ActionButtons from "./ActionButtons";
 import getLatestComments from "../../utils/getLatestComments";
 import { useRecoilValue } from "recoil";
 import userAtom from "../atoms/userAtom";
-import useShowToast from "../hooks/useShowToast";
+import useDeletePost from "../hooks/useDeletePost";
 
 function Post({ post }) {
   const { postedBy: user } = post;
@@ -16,27 +16,9 @@ function Post({ post }) {
 
   const currentUser = useRecoilValue(userAtom);
 
+  const { handleDeletePost } = useDeletePost(post);
+
   const uniqueLatestComments = getLatestComments(post.replies);
-  const showToast = useShowToast();
-
-  const handleDeletePost = async (e) => {
-    e.preventDefault();
-
-    try {
-      if (!window.confirm("Are you sure to delete this post?")) return;
-      const res = await fetch(`/api/posts/${post._id}`, {
-        method: "DELETE",
-      });
-      const data = await res.json();
-      if (data.error) {
-        showToast("Error", data.error, "error");
-        return;
-      }
-      showToast("Success", "Post deleted", "success");
-    } catch (error) {
-      showToast("Error", error.message, "error");
-    }
-  };
 
   return (
     <Link to={`/${user.username}/post/${post._id}`}>
