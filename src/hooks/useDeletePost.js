@@ -1,6 +1,10 @@
+import { useRecoilState } from "recoil";
 import useShowToast from "./useShowToast";
+import postAtom from "../atoms/postAtom";
 
-function useDeletePost({ post }) {
+function useDeletePost(post) {
+  const [posts, setPosts] = useRecoilState(postAtom);
+
   const showToast = useShowToast();
 
   const handleDeletePost = async (e) => {
@@ -17,6 +21,7 @@ function useDeletePost({ post }) {
         return;
       }
       showToast("Success", "Post deleted", "success");
+      setPosts(posts.filter((p) => p._id !== post._id));
     } catch (error) {
       showToast("Error", error.message, "error");
     }

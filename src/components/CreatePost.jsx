@@ -23,9 +23,10 @@ import {
 import { BsFillImageFill } from "react-icons/bs";
 
 import usePreviewImage from "../hooks/usePreviewImage";
-import { useRecoilValue } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
 import userAtom from "../atoms/userAtom";
 import useShowToast from "../hooks/useShowToast";
+import postAtom from "../atoms/postAtom";
 
 const MAX_CHAR = 500;
 
@@ -45,6 +46,7 @@ function CreatePost() {
 
   // Recoil
   const user = useRecoilValue(userAtom);
+  const [posts, setPosts] = useRecoilState(postAtom);
 
   const handleTextChange = (e) => {
     const inputText = e.target.value;
@@ -81,6 +83,8 @@ function CreatePost() {
         return;
       }
       showToast("Success", "Post created successfully", "success");
+      console.log(data);
+      setPosts([data, ...posts]);
       onClose();
       setPostText("");
       setImageUrl("");
@@ -99,6 +103,7 @@ function CreatePost() {
         right={10}
         leftIcon={<AddIcon />}
         bg={useColorModeValue("gray.300", "gray.dark")}
+        size={{ base: "sm", sm: "md" }}
         onClick={onOpen}>
         Post
       </Button>
