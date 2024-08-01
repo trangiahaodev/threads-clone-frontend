@@ -10,7 +10,7 @@ import postAtom from "../atoms/postAtom";
 
 function UserPage() {
   // React hooks
-  const [userPosts, setUserPosts] = useRecoilState(postAtom);
+  const [posts, setPosts] = useRecoilState(postAtom);
   const [fetchingPosts, setFetchingPosts] = useState(true);
   const { username } = useParams();
 
@@ -19,7 +19,7 @@ function UserPage() {
   const { loading, user } = useGetUserProfile(); // Get user to render userHeader
 
   useEffect(() => {
-    // Get posts of a user
+    // Get all posts from a user
     const getPosts = async () => {
       setFetchingPosts(true);
       try {
@@ -29,17 +29,17 @@ function UserPage() {
           showToast("Error", data.error, "error");
           return;
         }
-        setUserPosts(data);
+        setPosts(data);
       } catch (error) {
         showToast("Error", error.message, "error");
-        setUserPosts([]);
+        setPosts([]);
       } finally {
         setFetchingPosts(false);
       }
     };
 
     getPosts();
-  }, [username, showToast, setUserPosts]);
+  }, [username, showToast, setPosts]);
 
   if (!user && loading)
     return (
@@ -53,15 +53,13 @@ function UserPage() {
   return (
     <>
       <UserHeader user={user} />
-      {!fetchingPosts && userPosts.length === 0 && (
-        <h1>This user has no posts</h1>
-      )}
+      {!fetchingPosts && posts.length === 0 && <h1>This user has no posts</h1>}
       {fetchingPosts && (
         <Flex justifyContent={"center"} my={12}>
           <Spinner size={"xl"} />
         </Flex>
       )}
-      {userPosts.map((post) => (
+      {posts.map((post) => (
         <Post key={post._id} post={post} />
       ))}
     </>

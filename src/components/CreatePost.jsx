@@ -83,8 +83,9 @@ function CreatePost() {
         return;
       }
       showToast("Success", "Post created successfully", "success");
-      console.log(data);
       setPosts([data, ...posts]);
+
+      // Reset form
       onClose();
       setPostText("");
       setImageUrl("");

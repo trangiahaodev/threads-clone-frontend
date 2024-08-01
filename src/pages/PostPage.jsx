@@ -14,7 +14,7 @@ import {
 } from "@chakra-ui/react";
 import { DeleteIcon } from "@chakra-ui/icons";
 
-import { useRecoilValue } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
 import userAtom from "../atoms/userAtom";
 
 import ActionButtons from "../components/ActionButtons";
@@ -22,11 +22,9 @@ import Comments from "../components/Comments";
 
 import useGetUserProfile from "../hooks/useGetUserProfile";
 import useShowToast from "../hooks/useShowToast";
+import postAtom from "../atoms/postAtom";
 
 function PostPage() {
-  // React hooks
-  const [post, setPost] = useState(null);
-
   // Custom hooks
   const { loading, user } = useGetUserProfile();
   const showToast = useShowToast();
@@ -37,6 +35,9 @@ function PostPage() {
 
   // Recoil hooks
   const currentUser = useRecoilValue(userAtom);
+  const [posts, setPosts] = useRecoilState(postAtom);
+
+  const currentPost = posts[0];
 
   useEffect(() => {
     const getPost = async () => {
@@ -47,19 +48,19 @@ function PostPage() {
           showToast("Error", data.error, "error");
           return;
         }
-        setPost(data);
+        setPosts([data]);
       } catch (error) {
         showToast("Error", error.message, "error");
       }
     };
 
     getPost();
-  }, [pid, showToast]);
+  }, [pid, showToast, setPosts]);
 
   const handleDeletePost = async () => {
     try {
       if (!window.confirm("Are you sure to delete this post?")) return;
-      const res = await fetch(`/api/posts/${post._id}`, {
+      const res = await fetch(`/api/posts/${currentPost._id}`, {
         method: "DELETE",
       });
       const data = await res.json();
@@ -81,7 +82,7 @@ function PostPage() {
       </Flex>
     );
 
-  if (!post) return null;
+  if (!currentPost) return null;
 
   return (
     <>
@@ -103,7 +104,7 @@ function PostPage() {
             textAlign={"right"}
             width={36}
             color={"gray.light"}>
-            {formatDistanceToNow(new Date(post.createdAt))} ago
+            {formatDistanceToNow(new Date(currentPost.createdAt))} ago
           </Text>
 
           {currentUser?._id === user._id && (
@@ -116,20 +117,20 @@ function PostPage() {
         </Flex>
       </Flex>
 
-      <Text my={3}>{post.text}</Text>
+      <Text my={3}>{currentPost.text}</Text>
 
-      {post.img && (
+      {currentPost.img && (
         <Box
           borderRadius={6}
           overflow={"hidden"}
           border={"1px solid"}
           borderColor={"gray.light"}>
-          <Image src={post.img} w={"full"} />
+          <Image src={currentPost.img} w={"full"} />
         </Box>
       )}
 
       <Flex gap={3} my={3} className="reactions">
-        <ActionButtons post={post} />
+        <ActionButtons post={currentPost} />
       </Flex>
 
       <Divider my={4} />
@@ -144,11 +145,14 @@ function PostPage() {
 
       <Divider my={4} />
 
-      {post.replies.map((reply) => (
+      {currentPost.replies.map((reply) => (
         <Comments
           key={reply._id}
           reply={reply}
-          lastReply={reply._id === post.replies[post.replies.length - 1]._id}
+          lastReply={
+            reply._id ===
+            currentPost.replies[currentPost.replies.length - 1]._id
+          }
         />
       ))}
     </>

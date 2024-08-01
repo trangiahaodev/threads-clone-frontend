@@ -1,14 +1,16 @@
 import { useState } from "react";
 
-import { useRecoilValue } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
 import userAtom from "../atoms/userAtom";
+import postAtom from "../atoms/postAtom";
 
 import useShowToast from "../hooks/useShowToast";
 
-function LikeSVG({ postData, post, setPost }) {
+function LikeSVG({ post }) {
   const user = useRecoilValue(userAtom);
+  const [posts, setPosts] = useRecoilState(postAtom);
 
-  const [liked, setLiked] = useState(postData.likes.includes(user?._id));
+  const [liked, setLiked] = useState(post.likes.includes(user?._id));
   const [loading, setLoading] = useState(false);
 
   const showToast = useShowToast();
@@ -40,13 +42,20 @@ function LikeSVG({ postData, post, setPost }) {
 
       if (!liked) {
         // Add the current user._id to post.likes array
-        setPost({ ...post, likes: [...post.likes, user._id] });
+        const updatedPosts = posts.map((p) => {
+          if (p._id === post._id)
+            return { ...p, likes: [...p.likes, user._id] };
+          else return p;
+        });
+        setPosts(updatedPosts);
       } else {
         // Remove the current user._id to post.likes array
-        setPost({
-          ...post,
-          likes: post.likes.filter((id) => id !== user._id),
+        const updatedPosts = posts.map((p) => {
+          if (p._id === post._id)
+            return { ...p, likes: p.likes.filter((id) => id !== user._id) };
+          else return p;
         });
+        setPosts(updatedPosts);
       }
 
       setLiked(!liked);

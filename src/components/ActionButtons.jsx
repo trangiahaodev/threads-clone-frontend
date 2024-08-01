@@ -1,18 +1,14 @@
 import { Box, Flex, Text } from "@chakra-ui/react";
-import { useState } from "react";
 
 import CommentSVG from "./CommentSVG";
 import LikeSVG from "./LikeSVG";
 
-function ActionButtons({ post: postData }) {
-  // Setter function to set postData's state (i.e: likes, comments, ...)
-  const [post, setPost] = useState(postData);
-
+function ActionButtons({ post }) {
   return (
     <Flex flexDirection={"column"}>
       <Flex gap={3} my={2} onClick={(e) => e.preventDefault()}>
-        <LikeSVG postData={postData} post={post} setPost={setPost} />
-        <CommentSVG post={post} setPost={setPost} />
+        <LikeSVG post={post} />
+        <CommentSVG post={post} />
         <RepostSVG />
         <ShareSVG />
       </Flex>

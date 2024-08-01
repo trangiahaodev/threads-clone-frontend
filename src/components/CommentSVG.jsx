@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
   Button,
   FormControl,
@@ -11,18 +12,21 @@ import {
   ModalOverlay,
   useDisclosure,
 } from "@chakra-ui/react";
-import { useState } from "react";
-import useShowToast from "../hooks/useShowToast";
-import { useRecoilValue } from "recoil";
-import userAtom from "../atoms/userAtom";
 
-function CommentSVG({ post, setPost }) {
+import useShowToast from "../hooks/useShowToast";
+
+import { useRecoilState, useRecoilValue } from "recoil";
+import userAtom from "../atoms/userAtom";
+import postAtom from "../atoms/postAtom";
+
+function CommentSVG({ post }) {
   // React hooks
   const [postReplies, setPostReplies] = useState("");
   const [loading, setLoading] = useState(false);
 
   // Recoil hooks
   const user = useRecoilValue(userAtom);
+  const [posts, setPosts] = useRecoilState(postAtom);
 
   // Chakra UI hooks
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -54,7 +58,12 @@ function CommentSVG({ post, setPost }) {
         return;
       }
 
-      setPost({ ...post, replies: [...post.replies, data.reply] });
+      const updatedPosts = posts.map((p) => {
+        if (p._id === post._id) return { ...p, replies: [...p.replies, data] };
+        else return p;
+      });
+      setPosts(updatedPosts);
+
       showToast("Success", "Reply created successfully", "success");
       setPostReplies("");
       onClose();
