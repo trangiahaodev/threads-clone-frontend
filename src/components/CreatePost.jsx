@@ -22,11 +22,14 @@ import {
 } from "@chakra-ui/react";
 import { BsFillImageFill } from "react-icons/bs";
 
-import usePreviewImage from "../hooks/usePreviewImage";
 import { useRecoilState, useRecoilValue } from "recoil";
 import userAtom from "../atoms/userAtom";
-import useShowToast from "../hooks/useShowToast";
 import postAtom from "../atoms/postAtom";
+
+import usePreviewImage from "../hooks/usePreviewImage";
+import useShowToast from "../hooks/useShowToast";
+
+import { useParams } from "react-router-dom";
 
 const MAX_CHAR = 500;
 
@@ -47,6 +50,9 @@ function CreatePost() {
   // Recoil
   const user = useRecoilValue(userAtom);
   const [posts, setPosts] = useRecoilState(postAtom);
+
+  // React-router hook
+  const { username } = useParams();
 
   const handleTextChange = (e) => {
     const inputText = e.target.value;
@@ -83,7 +89,9 @@ function CreatePost() {
         return;
       }
       showToast("Success", "Post created successfully", "success");
-      setPosts([data, ...posts]);
+
+      // Check if the user is viewing their own profile
+      if (username === user.username) setPosts([data, ...posts]);
 
       // Reset form
       onClose();

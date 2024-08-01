@@ -19,8 +19,12 @@ import userAtom from "../atoms/userAtom";
 
 import usePreviewImage from "../hooks/usePreviewImage";
 import useShowToast from "../hooks/useShowToast";
+import { useNavigate } from "react-router-dom";
 
 export default function UpdateProfilePage() {
+  // React-router hooks
+  const navigate = useNavigate();
+
   // Recoil hooks
   const [user, setUser] = useRecoilState(userAtom);
 
@@ -185,7 +189,8 @@ export default function UpdateProfilePage() {
               w="full"
               _hover={{
                 bg: "red.500",
-              }}>
+              }}
+              onClick={() => navigate(`/${user.username}`)}>
               Cancel
             </Button>
             <Button
