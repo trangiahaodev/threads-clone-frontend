@@ -1,19 +1,30 @@
-import { Button, Flex, Image, useColorMode } from "@chakra-ui/react";
+// React
+import { Link } from "react-router-dom";
+
+// Recoil
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import userAtom from "../atoms/userAtom";
-import { Link } from "react-router-dom";
+import authScreenAtom from "../atoms/authAtom";
+
+// Chakra UI
+import { Button, Flex, Image, useColorMode } from "@chakra-ui/react";
 import { AiFillHome } from "react-icons/ai";
 import { RxAvatar } from "react-icons/rx";
 import { FiLogOut } from "react-icons/fi";
+import { BsFillChatQuoteFill } from "react-icons/bs";
+
+// Custom hooks
 import useLogout from "../hooks/useLogout";
-import authScreenAtom from "../atoms/authAtom";
 
 function Header() {
+  // Recoil
   const user = useRecoilValue(userAtom);
   const setAuthScreen = useSetRecoilState(authScreenAtom);
 
+  // Chakra UI
   const { colorMode, toggleColorMode } = useColorMode();
 
+  // Cudtom hooks
   const { handleLogout } = useLogout();
 
   return (
@@ -42,6 +53,9 @@ function Header() {
         <Flex alignItems={"center"} gap={4}>
           <Link to={`/${user.username}`}>
             <RxAvatar size={24} />
+          </Link>
+          <Link to={`/chat`}>
+            <BsFillChatQuoteFill size={20} />
           </Link>
           <Button size={"xs"} onClick={handleLogout}>
             <FiLogOut size={20} />
