@@ -5,11 +5,27 @@ import {
   Image,
   Stack,
   Text,
+  useColorMode,
   useColorModeValue,
   WrapItem,
 } from "@chakra-ui/react";
+import { BsCheck2All } from "react-icons/bs";
 
-function Conversations() {
+import { useRecoilState, useRecoilValue } from "recoil";
+import userAtom from "../atoms/userAtom";
+import { selectedConversationAtom } from "../atoms/conversationsAtom";
+
+function Conversations({ conversation }) {
+  const user = conversation.participants[0];
+  const lastMessage = conversation.lastMessage;
+
+  const currentUser = useRecoilValue(userAtom);
+  const [selectedConversation, setSelectedConversation] = useRecoilState(
+    selectedConversationAtom
+  );
+
+  const colorMode = useColorMode();
+
   return (
     <Flex
       gap={4}
@@ -20,6 +36,21 @@ function Conversations() {
         bg: useColorModeValue("gray.600", "gray.dark"),
         color: "white",
       }}
+      onClick={() =>
+        setSelectedConversation({
+          _id: conversation._id,
+          userId: user._id,
+          userProfilePicture: user.profilePicture,
+          username: user.username,
+          mock: conversation.mock,
+        })
+      }
+      bg={
+        selectedConversation?._id === conversation._id
+          ? // prettier-ignore
+            colorMode === "light" ? "gray.400" : "gray.dark"
+          : ""
+      }
       borderRadius={"md"}>
       <WrapItem>
         <Avatar
@@ -28,17 +59,25 @@ function Conversations() {
             sm: "sm",
             md: "md",
           }}
-          src="https://bit.ly/borken-link">
+          src={user.profilePicture}>
           <AvatarBadge boxSize={"1em"} bg={"green.500"} />
         </Avatar>
       </WrapItem>
 
       <Stack direction={"column"} fontSize={"sm"}>
         <Text fontWeight={700} display={"flex"} alignItems={"center"}>
-          johndoe <Image src="/verified.png" w={4} h={4} ml={1} />
+          {user.username}
+          <Image src="/verified.png" w={4} h={4} ml={1} />
         </Text>
         <Text fontSize="xs" display={"flex"} alignItems={"center"} gap={1}>
-          Hello World
+          {currentUser._id === lastMessage.sender ? (
+            <BsCheck2All size={16} />
+          ) : (
+            ""
+          )}
+          {lastMessage.text.length > 18
+            ? lastMessage.text.substring(0, 18) + "..."
+            : lastMessage.text}
         </Text>
       </Stack>
     </Flex>
