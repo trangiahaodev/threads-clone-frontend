@@ -48,7 +48,7 @@ function MessageContainer() {
     };
 
     getMessage();
-  }, [showToast, selectedConversation.userId]);
+  }, [showToast, selectedConversation.userId, selectedConversation.mock]);
 
   return (
     <Flex

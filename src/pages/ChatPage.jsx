@@ -18,12 +18,12 @@ import {
   conversationsAtom,
   selectedConversationAtom,
 } from "../atoms/conversationsAtom";
+import userAtom from "../atoms/userAtom";
 
 import Conversations from "../components/Conversations";
 import MessageContainer from "../components/MessageContainer";
 
 import useShowToast from "../hooks/useShowToast";
-import userAtom from "../atoms/userAtom";
 
 function ChatPage() {
   const [searchText, setSearchText] = useState("");
