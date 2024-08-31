@@ -24,6 +24,7 @@ import Conversations from "../components/Conversations";
 import MessageContainer from "../components/MessageContainer";
 
 import useShowToast from "../hooks/useShowToast";
+import { useSocket } from "../../context/SocketContext";
 
 function ChatPage() {
   const [searchText, setSearchText] = useState("");
@@ -37,6 +38,8 @@ function ChatPage() {
   const currentUser = useRecoilValue(userAtom);
 
   const showToast = useShowToast();
+
+  const { socket, onlineUsers } = useSocket();
 
   useEffect(() => {
     const getConversations = async () => {
@@ -182,6 +185,9 @@ function ChatPage() {
             conversations.map((conversation) => (
               <Conversations
                 key={conversation._id}
+                isOnline={onlineUsers.includes(
+                  conversation.participants[0]._id
+                )}
                 conversation={conversation}
               />
             ))}

@@ -1,6 +1,7 @@
 import {
   Avatar,
   AvatarBadge,
+  Box,
   Flex,
   Image,
   Stack,
@@ -15,7 +16,7 @@ import { useRecoilState, useRecoilValue } from "recoil";
 import userAtom from "../atoms/userAtom";
 import { selectedConversationAtom } from "../atoms/conversationsAtom";
 
-function Conversations({ conversation }) {
+function Conversations({ conversation, isOnline }) {
   const user = conversation.participants[0];
   const lastMessage = conversation.lastMessage;
 
@@ -60,7 +61,7 @@ function Conversations({ conversation }) {
             md: "md",
           }}
           src={user.profilePicture}>
-          <AvatarBadge boxSize={"1em"} bg={"green.500"} />
+          {isOnline && <AvatarBadge boxSize={"1em"} bg={"green.500"} />}
         </Avatar>
       </WrapItem>
 
@@ -71,10 +72,13 @@ function Conversations({ conversation }) {
         </Text>
         <Text fontSize="xs" display={"flex"} alignItems={"center"} gap={1}>
           {currentUser._id === lastMessage.sender ? (
-            <BsCheck2All size={16} />
+            <Box color={lastMessage.seen ? "blue.400" : ""}>
+              <BsCheck2All size={16} />
+            </Box>
           ) : (
             ""
           )}
+
           {lastMessage.text.length > 18
             ? lastMessage.text.substring(0, 18) + "..."
             : lastMessage.text}

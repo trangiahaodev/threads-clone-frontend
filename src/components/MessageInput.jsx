@@ -43,20 +43,21 @@ function MessageInput({ setMessages }) {
       }
 
       setMessages((messages) => [...messages, data]);
+
       setConversations((prevConvs) => {
-        const updatedConversation = prevConvs.map((con) => {
-          if (con._id === selectedConversation._id) {
+        const updatedConversations = prevConvs.map((conversation) => {
+          if (conversation._id === selectedConversation._id) {
             return {
-              ...con,
+              ...conversation,
               lastMessage: {
                 text: messageText,
                 sender: data.sender,
               },
             };
           }
-          return con;
+          return conversation;
         });
-        return updatedConversation;
+        return updatedConversations;
       });
 
       setMessageText("");
