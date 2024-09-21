@@ -10,7 +10,7 @@ import {
   useColorModeValue,
   WrapItem,
 } from "@chakra-ui/react";
-import { BsCheck2All } from "react-icons/bs";
+import { BsCheck2All, BsFillImageFill } from "react-icons/bs";
 
 import { useRecoilState, useRecoilValue } from "recoil";
 import userAtom from "../atoms/userAtom";
@@ -18,13 +18,12 @@ import { selectedConversationAtom } from "../atoms/conversationsAtom";
 
 function Conversations({ conversation, isOnline }) {
   const user = conversation.participants[0];
+  const currentUser = useRecoilValue(userAtom);
   const lastMessage = conversation.lastMessage;
 
-  const currentUser = useRecoilValue(userAtom);
   const [selectedConversation, setSelectedConversation] = useRecoilState(
     selectedConversationAtom
   );
-
   const colorMode = useColorMode();
 
   return (
@@ -61,7 +60,7 @@ function Conversations({ conversation, isOnline }) {
             md: "md",
           }}
           src={user.profilePicture}>
-          {isOnline && <AvatarBadge boxSize={"1em"} bg={"green.500"} />}
+          {isOnline ? <AvatarBadge boxSize={"1em"} bg={"green.500"} /> : ""}
         </Avatar>
       </WrapItem>
 
@@ -79,9 +78,14 @@ function Conversations({ conversation, isOnline }) {
             ""
           )}
 
-          {lastMessage.text.length > 18
+          {lastMessage.text?.length > 18
             ? lastMessage.text.substring(0, 18) + "..."
-            : lastMessage.text}
+            : lastMessage.text || (
+                <>
+                  <BsFillImageFill size={16} />
+                  <span>Image sent</span>
+                </>
+              )}
         </Text>
       </Stack>
     </Flex>

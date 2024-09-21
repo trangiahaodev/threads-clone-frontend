@@ -1,7 +1,22 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 
-import { Input, InputGroup, InputRightElement } from "@chakra-ui/react";
+import {
+  Flex,
+  Image,
+  Input,
+  InputGroup,
+  InputRightElement,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalHeader,
+  ModalOverlay,
+  Spinner,
+  useDisclosure,
+} from "@chakra-ui/react";
 import { IoSendSharp } from "react-icons/io5";
+import { BsFillImageFill } from "react-icons/bs";
 
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import {
@@ -9,20 +24,28 @@ import {
   selectedConversationAtom,
 } from "../atoms/conversationsAtom";
 
+import usePreviewImage from "../hooks/usePreviewImage";
 import useShowToast from "../hooks/useShowToast";
 
 function MessageInput({ setMessages }) {
   const [messageText, setMessageText] = useState("");
+  const [isSending, setIsSending] = useState(false);
+  const imageRef = useRef(null);
+
+  const { onClose } = useDisclosure();
 
   const selectedConversation = useRecoilValue(selectedConversationAtom);
   const setConversations = useSetRecoilState(conversationsAtom);
 
   const showToast = useShowToast();
+  const { handleImageChange, imageUrl, setImageUrl } = usePreviewImage();
 
   const handleSendMessage = async (e) => {
     e.preventDefault();
 
-    if (!messageText) return;
+    if (!messageText && !imageUrl) return;
+    if (isSending) return;
+    setIsSending(true);
 
     try {
       const res = await fetch("/api/messages", {
@@ -33,6 +56,7 @@ function MessageInput({ setMessages }) {
         body: JSON.stringify({
           message: messageText,
           recipientId: selectedConversation.userId,
+          img: imageUrl,
         }),
       });
       const data = await res.json();
@@ -61,25 +85,67 @@ function MessageInput({ setMessages }) {
       });
 
       setMessageText("");
+      setImageUrl("");
     } catch (error) {
       showToast("Error", error.message, "error");
+    } finally {
+      setIsSending(false);
     }
   };
 
   return (
-    <form onSubmit={handleSendMessage}>
-      <InputGroup>
+    <Flex gap={2} alignItems={"center"}>
+      <form onSubmit={handleSendMessage} style={{ flex: 95 }}>
+        <InputGroup>
+          <Input
+            w={"full"}
+            placeholder="Type a message"
+            onChange={(e) => setMessageText(e.target.value)}
+            value={messageText}
+          />
+          <InputRightElement onClick={handleSendMessage} cursor={"pointer"}>
+            <IoSendSharp />
+          </InputRightElement>
+        </InputGroup>
+      </form>
+      <Flex flex={5} cursor={"pointer"}>
+        <BsFillImageFill size={20} onClick={() => imageRef.current.click()} />
         <Input
-          w={"full"}
-          placeholder="Type a message"
-          onChange={(e) => setMessageText(e.target.value)}
-          value={messageText}
+          type={"file"}
+          hidden
+          ref={imageRef}
+          onChange={handleImageChange}
         />
-        <InputRightElement onClick={handleSendMessage} cursor={"pointer"}>
-          <IoSendSharp />
-        </InputRightElement>
-      </InputGroup>
-    </form>
+      </Flex>
+      <Modal
+        isOpen={imageUrl}
+        onClose={() => {
+          onClose();
+          setImageUrl("");
+        }}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader></ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <Flex mt={5} w={"full"}>
+              <Image src={imageUrl} />
+            </Flex>
+            <Flex justifyContent={"flex-end"} my={2}>
+              {!isSending ? (
+                <IoSendSharp
+                  size={24}
+                  cursor={"pointer"}
+                  onClick={handleSendMessage}
+                />
+              ) : (
+                <Spinner size={"md"} />
+              )}
+            </Flex>
+          </ModalBody>
+        </ModalContent>
+      </Modal>
+    </Flex>
   );
 }
 

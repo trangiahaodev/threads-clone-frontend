@@ -22,27 +22,33 @@ import userAtom from "../atoms/userAtom";
 import { useSocket } from "../../context/SocketContext";
 
 function MessageContainer() {
-  const showToast = useShowToast();
+  // React hooks
+  const [loadingMessages, setLoadingMessages] = useState(true);
+  const [messages, setMessages] = useState([]);
+  const messageEndRef = useRef(null);
 
+  // Recoil hooks
+  const setConversations = useSetRecoilState(conversationsAtom);
   const selectedConversation = useRecoilValue(selectedConversationAtom);
   const currentUser = useRecoilValue(userAtom);
 
-  const [loadingMessages, setLoadingMessages] = useState(true);
-  const [messages, setMessages] = useState([]);
-
+  // Custom hooks
   const { socket } = useSocket();
-  const setConversations = useSetRecoilState(conversationsAtom);
+  const showToast = useShowToast();
 
-  const messsageEndRef = useRef(null);
-
+  // Real-time updating messages
   useEffect(() => {
     socket.on("newMessage", (message) => {
+      // Check if the message belongs to the selected conversation
       if (selectedConversation._id === message.conversationId) {
         setMessages((prev) => [...prev, message]);
       }
 
+      // Update the lastest message in the conversation
       setConversations((prev) => {
         const updatedConversations = prev.map((conversation) => {
+          // Loop through the conversations and check if the conversation ID matches
+          // then update the lastest message
           if (conversation._id === message.conversationId) {
             return {
               ...conversation,
@@ -62,14 +68,43 @@ function MessageContainer() {
   }, [socket, selectedConversation, setConversations]);
 
   useEffect(() => {
-    messsageEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  });
+    const lastMessageIsFromOtherUser =
+      messages.length &&
+      messages[messages.length - 1].sender !== currentUser._id;
 
+    if (lastMessageIsFromOtherUser) {
+      socket.emit("markMessagesAsSeen", {
+        conversationId: selectedConversation._id,
+        userId: selectedConversation.userId,
+      });
+    }
+
+    socket.on("messagesSeen", ({ conversationId }) => {
+      if (selectedConversation._id === conversationId) {
+        setMessages((prev) => {
+          const updatedMessages = prev.map((message) => {
+            if (!message.seen) {
+              return { ...message, seen: true };
+            }
+            return message;
+          });
+          return updatedMessages;
+        });
+      }
+    });
+  }, [socket, currentUser._id, selectedConversation, messages]);
+
+  useEffect(() => {
+    messageEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
+
+  // Fetch messages
   useEffect(() => {
     const getMessages = async () => {
       setLoadingMessages(true);
       setMessages([]);
       try {
+        // If the conversation is mock, skip the fetching of messages
         if (selectedConversation.mock) return;
         const res = await fetch(`/api/messages/${selectedConversation.userId}`);
         const data = await res.json();
@@ -139,8 +174,8 @@ function MessageContainer() {
               key={message._id}
               direction={"column"}
               ref={
-                message.length - 1 === messages.indexOf(message)
-                  ? messsageEndRef
+                messages.length - 1 === messages.indexOf(message)
+                  ? messageEndRef
                   : null
               }>
               <Message
