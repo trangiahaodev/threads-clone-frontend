@@ -8,7 +8,7 @@ export default defineConfig({
     // Get rid of the CORS error
     proxy: {
       "/api": {
-        target: "http://localhost:5000",
+        target: `${import.meta.env.MERN_APP_BACKEND_BASEURL}`,
         changeOrigin: true,
         secure: false,
       },
