@@ -21,6 +21,8 @@ import userAtom from "../atoms/userAtom";
 
 import { useSocket } from "../../context/SocketContext";
 
+import messageSound from "../assets/sounds/message.mp3";
+
 function MessageContainer() {
   // React hooks
   const [loadingMessages, setLoadingMessages] = useState(true);
@@ -41,7 +43,13 @@ function MessageContainer() {
     socket.on("newMessage", (message) => {
       // Check if the message belongs to the selected conversation
       if (selectedConversation._id === message.conversationId) {
+        console.log("messages: ", messages);
         setMessages((prev) => [...prev, message]);
+      }
+
+      if (!document.hasFocus()) {
+        const sound = new Audio(messageSound);
+        sound.play();
       }
 
       // Update the lastest message in the conversation
@@ -65,7 +73,7 @@ function MessageContainer() {
     });
 
     return () => socket.off("newMessage");
-  }, [socket, selectedConversation, setConversations]);
+  }, [socket, selectedConversation, setConversations, messages]);
 
   useEffect(() => {
     const lastMessageIsFromOtherUser =
