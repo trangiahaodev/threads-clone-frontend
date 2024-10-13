@@ -15,7 +15,7 @@ export const SocketContextProvider = ({ children }) => {
   const [onlineUsers, setOnlineUsers] = useState([]);
 
   useEffect(() => {
-    const socket = io(`${import.meta.env.MERN_APP_BACKEND_BASEURL}`, {
+    const socket = io("http://localhost:5000", {
       query: {
         userId: user?._id,
       },
