@@ -15,10 +15,11 @@ export const SocketContextProvider = ({ children }) => {
   const [onlineUsers, setOnlineUsers] = useState([]);
 
   useEffect(() => {
-    const socket = io("http://localhost:5000", {
+    const socket = io("threads-clone-backend.vercel.app", {
       query: {
         userId: user?._id,
       },
+      transports: ["websocket"],
     });
 
     setSocket(socket);
