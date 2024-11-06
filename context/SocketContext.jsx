@@ -15,6 +15,8 @@ export const SocketContextProvider = ({ children }) => {
   const [onlineUsers, setOnlineUsers] = useState([]);
 
   useEffect(() => {
+    if (!user?._id) return;
+
     const socket = io("https://threads-clone-backend.vercel.app", {
       query: {
         userId: user?._id,
