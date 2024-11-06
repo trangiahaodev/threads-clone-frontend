@@ -17,12 +17,15 @@ export const SocketContextProvider = ({ children }) => {
   useEffect(() => {
     if (!user?._id) return;
 
-    const socket = io("https://threads-clone-backend.vercel.app", {
-      query: {
-        userId: user?._id,
-      },
-      transports: ["websocket"],
-    });
+    const socket = io(
+      "https://threads-clone-backend-4qzk1d5lp-allentran2606s-projects.vercel.app/",
+      {
+        query: {
+          userId: user?._id,
+        },
+        transports: ["websocket"],
+      }
+    );
 
     setSocket(socket);
 
