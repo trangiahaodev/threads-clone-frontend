@@ -3,11 +3,15 @@ import ReactDOM from "react-dom/client";
 import App from "./App.jsx";
 import "./index.css";
 
+import * as disableReactDevtools from "@fvilers/disable-react-devtools";
 import { ChakraProvider, ColorModeScript, extendTheme } from "@chakra-ui/react";
 import { mode } from "@chakra-ui/theme-tools";
 import { BrowserRouter } from "react-router-dom";
 import { RecoilRoot } from "recoil";
 import { SocketContextProvider } from "../context/SocketContext.jsx";
+
+// eslint-disable-next-line no-undef
+if (process.env.NODE_ENV === "production") disableReactDevtools();
 
 // Customize theme tokens
 const styles = {
