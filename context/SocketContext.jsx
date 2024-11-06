@@ -18,7 +18,8 @@ export const SocketContextProvider = ({ children }) => {
   useEffect(() => {
     if (!user?._id) return;
 
-    const socket = io("https://threads-clone-backend-1.onrender.com", {
+    // eslint-disable-next-line no-undef
+    const socket = io(process.env.BACKEND_URL, {
       query: {
         userId: user?._id,
       },
