@@ -9,8 +9,10 @@ import postAtom from "../atoms/postAtom";
 import SuggestedUsers from "../components/SuggestedUsers";
 
 function HomePage() {
-  const [posts, setPosts] = useRecoilState(postAtom);
+  const [posts, setPosts] = useRecoilState(postAtom) || [];
   const [loading, setLoading] = useState(true);
+
+  // console.log("posts: ", posts);
 
   const showToast = useShowToast();
 
@@ -26,7 +28,9 @@ function HomePage() {
           showToast("Error", data.error, "error");
           return;
         }
-        setPosts(data);
+
+        // Ensure data is indeed an array
+        setPosts(Array.isArray(data) ? data : []);
       } catch (error) {
         showToast("Error", error.message, "error");
       } finally {
