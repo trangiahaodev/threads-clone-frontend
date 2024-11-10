@@ -12,8 +12,6 @@ function HomePage() {
   const [posts, setPosts] = useRecoilState(postAtom);
   const [loading, setLoading] = useState(true);
 
-  console.log("posts: ", posts);
-
   const showToast = useShowToast();
 
   useEffect(() => {
